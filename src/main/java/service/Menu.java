@@ -37,9 +37,11 @@ public class Menu {
         System.out.printf("%-7s | %-20s%n", "CÓDIGO", "MARCA");
         System.out.println("-----------+-----------------------");
 
-        veiculos.forEach(marca -> {
-            System.out.printf("%-7s | %s%n", marca.code(), marca.name());
-        });
+        veiculos.stream()
+                .sorted(Comparator.comparing(Veiculo::code))
+                .forEach(marca -> {
+                    System.out.printf("%-7s | %s%n", marca.code(), marca.name());
+                });
 
         Map<String, List<Veiculo>> map = new HashMap<>();
         map.put(url, veiculos);
@@ -58,6 +60,7 @@ public class Menu {
 
         url = url + "/" + modelo + "/models";
         String dados = consumo.obterDados(url);
+
         List<Modelo> modelos = List.of(converte.obterDados(dados, Modelo[].class));
 
         System.out.println("\n***********************************");
@@ -66,7 +69,9 @@ public class Menu {
         System.out.printf("%-7s | %-20s%n", "CÓDIGO", "MODELO");
         System.out.println("-----------+-----------------------");
 
-        modelos.forEach(model -> {
+        modelos.stream()
+                .sorted(Comparator.comparing(Modelo::code))
+                .forEach(model -> {
             System.out.printf("%-7s | %s%n", model.code(), model.name());
         });
 
@@ -76,7 +81,7 @@ public class Menu {
         return map;
     }
 
-    public void listaAnos(Map<String, List<Modelo>> modelos) {
+    public void listaDadosCompletos(Map<String, List<Modelo>> modelos) {
 
         String url = modelos.keySet().iterator().next();
 
@@ -121,18 +126,20 @@ public class Menu {
         sc.close();
     }
 
-
     private <T extends DadosBasicos> String auxiliar(String cod, Collection<List<T>> listaClasses) {
 
-        if (sc.hasNextInt()) {
-            cod = sc.next();
-        }  else {
             String wordFilter = sc.next();
 
             Optional<T> veiculoFiltrado = listaClasses.stream()
                     .flatMap(List::stream)
-                    .filter(v -> v.name().toLowerCase().contains(wordFilter.toLowerCase()))
-                    .findFirst();
+                    .filter( v -> v.code().contains(wordFilter))
+                    .findFirst()
+                    .or( () ->
+                            listaClasses.stream()
+                                    .flatMap(List::stream)
+                                    .filter(v -> v.name().toLowerCase().contains(wordFilter.toLowerCase()))
+                                    .findFirst()
+                    );
 
             if (veiculoFiltrado.isPresent()) {
                 cod = String.valueOf(veiculoFiltrado.get().code());
@@ -146,9 +153,7 @@ public class Menu {
                 System.exit(0);
                 sc.close();
             }
-        }
 
-        return cod;
+            return cod;
     }
-
 }
