@@ -1,5 +1,7 @@
 package com.alura.FIPE;
 
+import model.Anos;
+import model.Modelo;
 import model.Veiculo;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,7 +24,7 @@ public class FipeApplication implements CommandLineRunner {
 
         Menu menu = new Menu();
         Map<String, List<Veiculo>> mapVeiculos = menu.listaTipoVeiculo();
-        Map<String, List<Veiculo>> mapModelos = menu.listaModelos(mapVeiculos);
+        Map<String, List<Modelo>> mapModelos = menu.listaModelos(mapVeiculos);
         menu.listaAnos(mapModelos);
     }
 }
