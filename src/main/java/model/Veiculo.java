@@ -1,7 +1,7 @@
 package model;
 
-public record Veiculo(
-        int codigo,
-        String nome
-) {
+public record Veiculo (
+       String code,
+       String name
+) implements DadosBasicos {
 }
