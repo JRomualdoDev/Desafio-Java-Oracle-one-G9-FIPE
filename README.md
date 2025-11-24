@@ -5,6 +5,8 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green)
 ![Maven](https://img.shields.io/badge/Maven-4.0.0-red)
 
+![FIPE GIF](assets/images/FIPE.gif)
+
 ## 🎯 Sobre o Projeto
 
 Este projeto é uma aplicação de console (CLI) desenvolvida em Java com o framework Spring Boot. O objetivo é consumir a API pública da Tabela FIPE para consultar preços de veículos de forma rápida e interativa. O usuário pode navegar entre tipos de veículos, marcas, modelos e anos para obter informações detalhadas sobre o valor de mercado.
