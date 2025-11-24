@@ -1,11 +1,11 @@
 
 #  Tabela FIPE - Consulta de Veículos 🚗
 
+![FIPE GIF](assets/images/FIPE.gif)
+
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green)
 ![Maven](https://img.shields.io/badge/Maven-4.0.0-red)
-
-![FIPE GIF](assets/images/FIPE.gif)
 
 ## 🎯 Sobre o Projeto
 
