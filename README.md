@@ -56,7 +56,7 @@ O diagrama abaixo ilustra o fluxo de interação do usuário com a aplicação.
 
 ```mermaid
 graph TD;
-    A[Início] --> B{Escolha o tipo de veículo<br>(Carro, Moto, Caminhão)};
+    A[Início] --> B{"Escolha o tipo de veículo<br>(Carro, Moto, Caminhão)"};
     B --> C[API: Busca Marcas];
     C --> D{Escolha a marca};
     D --> E[API: Busca Modelos];
@@ -64,7 +64,7 @@ graph TD;
     F --> G[API: Busca Anos/Versões do Modelo];
     G --> H[Processa todos os anos];
     H --> I[API: Busca dados detalhados para cada ano];
-    I --> J[Exibe tabela com<br>Ano, Combustível e Valor];
+    I --> J["Exibe tabela com<br>Ano, Combustível e Valor"];
     J --> K[Fim];
 ```
 
