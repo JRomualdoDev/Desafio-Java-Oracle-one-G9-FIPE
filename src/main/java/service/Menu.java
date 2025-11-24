@@ -1,18 +1,13 @@
 package service;
 
-import model.Anos;
-import model.Modelo;
-import model.Veiculo;
+import model.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Menu {
 
     Scanner sc = new Scanner(System.in);
-    private final String URL_API = "https://parallelum.com.br/fipe/api/v1/";
+    private final String URL_API = "https://fipe.parallelum.com.br/api/v2/";
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados converte = new ConverteDados();
 
@@ -22,9 +17,9 @@ public class Menu {
         String tipo = sc.next();
 
         tipo = switch (tipo) {
-            case "1" -> "carros";
-            case "2" -> "motos";
-            case "3" -> "caminhos";
+            case "1" -> "cars";
+            case "2" -> "motorcycles";
+            case "3" -> "trucks";
             default -> "sair";
         };
 
@@ -33,7 +28,7 @@ public class Menu {
             System.exit(0);
         }
 
-        String url = URL_API + tipo + "/marcas";
+        String url = URL_API + tipo + "/brands";
         String dados = consumo.obterDados(url);
         List<Veiculo> veiculos = List.of(converte.obterDados(dados, Veiculo[].class));
         System.out.println("\n***********************************");
@@ -43,7 +38,7 @@ public class Menu {
         System.out.println("-----------+-----------------------");
 
         veiculos.forEach(marca -> {
-            System.out.printf("%-7s | %s%n", marca.codigo(), marca.nome());
+            System.out.printf("%-7s | %s%n", marca.code(), marca.name());
         });
 
         Map<String, List<Veiculo>> map = new HashMap<>();
@@ -52,19 +47,18 @@ public class Menu {
         return map;
     }
 
-    public Map<String, List<Veiculo>> listaModelos(Map<String, List<Veiculo>> veiculos) {
+    public Map<String, List<Modelo>> listaModelos(Map<String, List<Veiculo>> veiculos) {
 
         String url = veiculos.keySet().iterator().next();
 
         System.out.println("Digite um código ou nome do veiculo : ");
-        String modelo = sc.next();
+        String modelo = "";
 
-        //TODO: Agora está somente pelo id , precisa colocar por nome também
+        modelo = auxiliar(modelo, veiculos.values());
 
-        url = url + "/" + modelo + "/modelos";
+        url = url + "/" + modelo + "/models";
         String dados = consumo.obterDados(url);
-        Modelo modelos = converte.obterDados(dados, Modelo.class);
-        modelos.anos().forEach(System.out::println);
+        List<Modelo> modelos = List.of(converte.obterDados(dados, Modelo[].class));
 
         System.out.println("\n***********************************");
         System.out.println("       LISTA DE MODELOS       ");
@@ -72,74 +66,89 @@ public class Menu {
         System.out.printf("%-7s | %-20s%n", "CÓDIGO", "MODELO");
         System.out.println("-----------+-----------------------");
 
-        modelos.modelos().forEach(model -> {
-            System.out.printf("%-7s | %s%n", model.codigo(), model.nome());
+        modelos.forEach(model -> {
+            System.out.printf("%-7s | %s%n", model.code(), model.name());
         });
 
-        Map<String, List<Veiculo>> map = new HashMap<>();
-        map.put(url, modelos.modelos());
+        Map<String, List<Modelo>> map = new HashMap<>();
+        map.put(url, modelos);
 
         return map;
     }
 
-    public Map<String, List<Anos>> listaAnos(Map<String, List<Veiculo>> modelos) {
+    public void listaAnos(Map<String, List<Modelo>> modelos) {
 
         String url = modelos.keySet().iterator().next();
 
         System.out.println("Digite um código ou nome do modelo : ");
-        String ano = sc.next();
+        String ano = "";
 
-        //TODO: Agora está somente pelo id , precisa colocar por nome também
+        ano = auxiliar(ano, modelos.values());
 
-        url = url + "/" + ano + "/anos";
+        url = url + "/" + ano + "/years";
         String dados = consumo.obterDados(url);
         List<Anos> anos = List.of(converte.obterDados(dados, Anos[].class));
 
-        System.out.println("\n***********************************");
-        System.out.println("       LISTA DE ANOS      ");
-        System.out.println("***********************************");
-        System.out.printf("%-7s | %-20s%n", "CÓDIGO", "NOME");
-        System.out.println("-----------+-----------------------");
+        String finalUrl = url;
 
-        anos.forEach(model -> {
-            System.out.printf("%-7s | %s%n", model.codigo(), model.nome());
-        });
+        String formato = "%-12.12s | %-15.15s | %-15.15s | %-30.30s | %-9.9s | %-12.12s | %-10.10s | %-18.18s | %-5.5s%n";
 
-        Map<String, List<Anos>> map = new HashMap<>();
-        map.put(url, anos);
+        System.out.println("");
+        System.out.printf(formato,
+                "Tipo", "Valor", "Marca", "Modelo", "Ano", "Combust.", "FIPE", "Mês Ref.", "Sigla");
 
-        return map;
+        anos.forEach(
+                    model -> {
+                        String dadosCompleto = consumo.obterDados(finalUrl + "/" + model.code());
+                        DadosVeiculo dadosConvertido = converte.obterDados(dadosCompleto, DadosVeiculo.class);
+
+                        System.out.println("-".repeat(145));
+
+                        System.out.printf(formato,
+                                dadosConvertido.vehicleType(),
+                                dadosConvertido.price(),
+                                dadosConvertido.brand(),
+                                dadosConvertido.model(),
+                                dadosConvertido.modelYear(),
+                                dadosConvertido.fuel(),
+                                dadosConvertido.codeFipe(),
+                                dadosConvertido.referenceMonth(),
+                                dadosConvertido.fuelAcronym()
+                        );
+                    }
+                );
+
+        sc.close();
     }
 
-    public void listaDadosCompleto(Map<String, List<Anos>> anos) {
 
-        String url = anos.keySet().iterator().next();
+    private <T extends DadosBasicos> String auxiliar(String cod, Collection<List<T>> listaClasses) {
 
-        System.out.println("Digite um código ou nome do ano : ");
-        String cod = sc.next();
+        if (sc.hasNextInt()) {
+            cod = sc.next();
+        }  else {
+            String wordFilter = sc.next();
 
-        //TODO: Agora está somente pelo id , precisa colocar por nome também
+            Optional<T> veiculoFiltrado = listaClasses.stream()
+                    .flatMap(List::stream)
+                    .filter(v -> v.name().toLowerCase().contains(wordFilter.toLowerCase()))
+                    .findFirst();
 
-        url = url + "/" + cod;
-        String dados = consumo.obterDados(url);
-        List<Anos> dadoCompleto = List.of(converte.obterDados(dados, Anos[].class));
+            if (veiculoFiltrado.isPresent()) {
+                cod = String.valueOf(veiculoFiltrado.get().code());
+                System.out.println("");
+                System.out.println("------------------");
+                System.out.println("Primeiro Modelo encontrado com as letras: " + wordFilter);
+                System.out.println(veiculoFiltrado.get());
+                System.out.println("------------------");
+            } else {
+                System.out.println("O código ou nome do modelo não existe.");
+                System.exit(0);
+                sc.close();
+            }
+        }
 
-        System.out.println("\n***********************************");
-        System.out.println("       LISTA DE ANOS      ");
-        System.out.println("***********************************");
-        System.out.printf("%-7s | %-20s%n", "CÓDIGO", "NOME");
-        System.out.println("-----------+-----------------------");
-
-        anos.forEach(model -> {
-            System.out.printf("%-7s | %s%n", model.codigo(), model.nome());
-        });
-
-        Map<String, List<Anos>> map = new HashMap<>();
-        map.put(url, anos);
-
-        return map;
-
+        return cod;
     }
-
 
 }
