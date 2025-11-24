@@ -1,7 +1,7 @@
 package model;
 
 public record Anos(
-        String codigo,
-        String nome
-) {
+        String code,
+        String name
+) implements DadosBasicos{
 }
