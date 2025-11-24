@@ -3,7 +3,7 @@ package model;
 import java.util.List;
 
 public record Modelo(
-        List<Anos> anos,
-        List<Veiculo> modelos
-) {
+        String code,
+        String name
+) implements DadosBasicos{
 }
