@@ -25,6 +25,6 @@ public class FipeApplication implements CommandLineRunner {
         Menu menu = new Menu();
         Map<String, List<Veiculo>> mapVeiculos = menu.listaTipoVeiculo();
         Map<String, List<Modelo>> mapModelos = menu.listaModelos(mapVeiculos);
-        menu.listaAnos(mapModelos);
+        menu.listaDadosCompletos(mapModelos);
     }
 }
